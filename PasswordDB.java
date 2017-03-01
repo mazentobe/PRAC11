@@ -29,13 +29,26 @@ public class PasswordDB {
 			}
 		}
 	}
+	
+	public String getUserInfoBy(String username) throws DatabaseException {
+		for (User user : users) {
+			if (user.getUsername().equals(username)) {
+				return "Name: " + user.getName() + "; Username: " + user.getUsername() + "; Email: " + user.getEmail();
+			}
+		}
+		throw new DatabaseException("No user found with provided username!");
+	}
 
 	public static void main(String[] args) throws DatabaseException {
 		PasswordDB database = new PasswordDB();
 		Boolean shouldExecute = true;
 		while (shouldExecute) {
-			String command = JOptionPane.showInputDialog(null, "Input command (new, exit)");
-			if (command.equals("new")) {
+			Object[] possibleValues = { "New User", "Search For User", "Exit"};
+			Object command = JOptionPane.showInputDialog(null,
+			"Please select command", "Practical 11",
+			JOptionPane.INFORMATION_MESSAGE, null,
+			possibleValues, possibleValues[0]);
+			if (command.equals("New User")) {
 				String name = JOptionPane.showInputDialog(null, "Input name");
 				String username = "";
 				Boolean shouldAskUsernameAgain = true;
@@ -65,8 +78,17 @@ public class PasswordDB {
 				User user = new User(name, username, password, email);
 				database.addUser(user);
 				System.out.println(database.getUsers().size());
-			} else if (command.equals("exit")) {
+			} else if (command.equals("Exit")) {
 				shouldExecute = false;
+			} else if (command.equals("Search For User")) {
+				try {
+					String usernameToSearch = JOptionPane.showInputDialog(null, "Input username");
+					String info = database.getUserInfoBy(usernameToSearch);
+					JOptionPane.showMessageDialog(null, info,
+							"User information", JOptionPane.INFORMATION_MESSAGE);
+				} catch (DatabaseException err) {
+					err.toString();
+				}
 			} else {
 				System.out.println("no func");
 			}
